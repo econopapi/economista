@@ -4,13 +4,15 @@ build-backend = "hatchling.build"
 
 [project]
 name = "economista"
-version = "0.1.1"
+version = "0.1.2"
 description = "La biblioteca definitiva para datos, análisis e investigación económica aplicada en Python."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
 authors = [
-  { name = "Daniel Limón", email = "dani@dlimon.net" }
+  { name = "Daniel Limón", email = "dani@dlimon.net" },
+  { name = "Jesús Morales", email = "jesusmorales.hdz.2002@gmail.com" },
+  { name = "Fernando Pech", email = "ferconciente@gmail.com" }
 ]
 maintainers = [
   { name = "Daniel Limón", email = "dani@dlimon.net" }
