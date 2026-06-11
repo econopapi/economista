@@ -1,0 +1,110 @@
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "economista"
+version = "0.1.1.dev0"
+description = "La biblioteca definitiva para datos, análisis e investigación económica aplicada en Python."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [
+  { name = "Daniel Limón", email = "dani@dlimon.net" }
+]
+maintainers = [
+  { name = "Daniel Limón", email = "dani@dlimon.net" }
+]
+keywords = [
+  "economics",
+  "economic-data",
+  "econometrics",
+  "data-science",
+  "pandas",
+  "macroeconomics",
+  "python"
+]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Intended Audience :: Science/Research",
+  "Intended Audience :: Education",
+  "Intended Audience :: Financial and Insurance Industry",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Scientific/Engineering",
+  "Topic :: Scientific/Engineering :: Information Analysis",
+  "Typing :: Typed"
+]
+dependencies = [
+  "numpy>=1.26",
+  "pandas>=2.1",
+  "platformdirs>=4",
+  "typing-extensions>=4.8"
+]
+
+[project.optional-dependencies]
+data = [
+  "requests>=2.31",
+  "requests-cache>=1.1",
+  "httpx>=0.25",
+  "tenacity>=8.2",
+  "pyarrow>=14",
+  "openpyxl>=3.1"
+]
+analysis = [
+  "scipy>=1.11",
+  "statsmodels>=0.14"
+]
+viz = [
+  "matplotlib>=3.8",
+  "plotly>=5.18"
+]
+dev = [
+  "pytest>=8",
+  "pytest-cov>=5",
+  "hypothesis>=6",
+  "ruff>=0.4",
+  "mypy>=1.8",
+  "pandas-stubs>=2.1",
+  "pre-commit>=3.6",
+  "build>=1.2",
+  "twine>=5"
+]
+docs = [
+  "sphinx>=7",
+  "myst-parser>=2",
+  "pydata-sphinx-theme>=0.15"
+]
+
+[project.urls]
+Homepage = "https://econopapi.com/proyecto/economista-py/"
+Repository = "https://github.com/econopapi/economista"
+Issues = "https://github.com/econopapi/economista/issues"
+Documentation = "https://economista.readthedocs.io/"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/economista"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = []
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+mypy_path = "src"
+explicit_package_bases = true
+packages = ["economista"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
