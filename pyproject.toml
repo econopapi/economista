@@ -81,10 +81,10 @@ docs = [
 ]
 
 [project.urls]
-Homepage = "https://econopapi.com/proyecto/economista-py/"
+Homepage = "https://github.com/econopapi/economista"
 Repository = "https://github.com/econopapi/economista"
 Issues = "https://github.com/econopapi/economista/issues"
-Documentation = "https://economista.readthedocs.io/"
+Documentation = "https://github.com/econopapi/economista#readme"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/economista"]
