@@ -8,10 +8,11 @@ from __future__ import annotations
 
 from importlib.metadata import PackageMetadata, PackageNotFoundError, metadata, version
 
+from economista import data
 from economista.core.dataset import EconDataset
 from economista.core.metadata import EconMetadata
 from economista.core.query import DataQuery
-from economista.core.schema import EconSchema
+from economista.core.schema import CANONICAL_ECON_SCHEMA, EconSchema
 
 _DISTRIBUTION_NAME = "economista"
 
@@ -62,8 +63,10 @@ __all__ = [
     "__maintainers__",
     "__summary__",
     "__python_requires__",
+    "CANONICAL_ECON_SCHEMA",
     "EconDataset",
     "EconMetadata",
     "DataQuery",
     "EconSchema",
+    "data",
 ]
