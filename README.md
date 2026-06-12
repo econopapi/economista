@@ -17,3 +17,50 @@ Proyecto en fase fundacional. La API pública todavía no es estable.
 ```bash
 pip install economista
 ```
+
+La instalación base incluye el primer conector de datos, por lo que no necesitas
+extras para empezar a trabajar con World Bank/WDI.
+
+## Primer uso
+
+```python
+from economista import data
+
+ds = data.fetch(
+    source="world_bank",
+    dataset="wdi",
+    indicator="NY.GDP.MKTP.CD",
+    geo=["MEX", "COL"],
+    start=2000,
+    end=2024,
+)
+
+df = ds.to_pandas()
+metadata = ds.metadata.to_dict()
+```
+
+`data.fetch` devuelve un `EconDataset`: un `DataFrame` de pandas acompañado de
+metadata económica, esquema e historial mínimo de consulta.
+
+También puedes buscar indicadores:
+
+```python
+results = data.search(
+    source="world_bank",
+    query="GDP current US dollars",
+    limit=10,
+)
+```
+
+## Alcance actual
+
+El primer MVP funcional incluye World Bank/WDI, esquema canónico, metadata,
+exportación CSV/JSON/Parquet y caché local mínima. FRED, IMF, INEGI y carga
+local CSV/Excel serán los siguientes cortes.
+
+Ejemplos interactivos:
+
+- `examples/world_bank_gdp.ipynb`
+- `examples/world_bank_population.ipynb`
+- `examples/world_bank_gdp_growth.ipynb`
+- `examples/world_bank_inflation.ipynb`
