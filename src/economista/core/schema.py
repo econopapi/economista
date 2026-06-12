@@ -28,3 +28,29 @@ class EconSchema:
             raise SchemaValidationError(
                 f"Missing required columns: {', '.join(missing)}"
             )
+
+
+CANONICAL_ECON_SCHEMA = EconSchema(
+    required_columns=(
+        "geo",
+        "geo_name",
+        "time",
+        "value",
+        "indicator",
+        "indicator_name",
+        "unit",
+        "frequency",
+        "source",
+        "dataset",
+        "downloaded_at",
+    ),
+    optional_columns=(
+        "sector",
+        "product",
+        "currency",
+        "seasonal_adjustment",
+        "price_base",
+        "notes",
+    ),
+    primary_keys=("geo", "time", "indicator", "source", "dataset"),
+)
