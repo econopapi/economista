@@ -1,0 +1,20 @@
+[
+  {
+    "page": 1,
+    "pages": 1,
+    "per_page": 1000,
+    "total": 1
+  },
+  [
+    {
+      "id": "NY.GDP.MKTP.CD",
+      "name": "GDP (current US$)",
+      "unit": "",
+      "source": {
+        "id": "2",
+        "value": "World Development Indicators"
+      },
+      "sourceNote": "GDP at purchaser's prices is the sum of gross value added by all resident producers in the economy."
+    }
+  ]
+]
