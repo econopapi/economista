@@ -33,3 +33,7 @@ htmlcov/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Documentos de desarrollo
+AGENTS.md
+V1_ECONOMISTA_DOCUMENTO_FUNDACIONAL_DEFINITIVO.md
