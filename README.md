@@ -64,3 +64,8 @@ Ejemplos interactivos:
 - `examples/world_bank_population.ipynb`
 - `examples/world_bank_gdp_growth.ipynb`
 - `examples/world_bank_inflation.ipynb`
+
+## Desarrollo
+
+La guia para instalar, probar y trabajar localmente en el paquete esta en
+`docs/development/handbook.md`.
