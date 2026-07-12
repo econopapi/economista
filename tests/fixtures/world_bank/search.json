@@ -10,13 +10,40 @@
       "id": "NY.GDP.MKTP.CD",
       "name": "GDP (current US$)",
       "unit": "",
-      "sourceNote": "GDP at purchaser's prices is the sum of gross value added by all resident producers in the economy."
+      "sourceNote": "GDP at purchaser's prices is the sum of gross value added by all resident producers in the economy.",
+      "sourceOrganization": "World Bank national accounts data",
+      "topics": [
+        {
+          "id": "3",
+          "value": "Economy & Growth"
+        }
+      ]
     },
     {
       "id": "SP.POP.TOTL",
       "name": "Population, total",
       "unit": "",
-      "sourceNote": "Total population is based on the de facto definition of population."
+      "sourceNote": "Total population is based on the de facto definition of population.",
+      "sourceOrganization": "World Bank staff estimates",
+      "topics": [
+        {
+          "id": "8",
+          "value": "Health"
+        }
+      ]
+    },
+    {
+      "id": "DT.DOD.DECT.CD",
+      "name": "External debt stocks, total (DOD, current US$)",
+      "unit": "",
+      "sourceNote": "Total external debt is debt owed to nonresidents repayable in currency, goods, or services.",
+      "sourceOrganization": "World Bank International Debt Statistics",
+      "topics": [
+        {
+          "id": "6",
+          "value": "External Debt"
+        }
+      ]
     }
   ]
 ]

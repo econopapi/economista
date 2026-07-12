@@ -33,7 +33,8 @@ jobs:
         run: ruff check .
 
       - name: Mypy
-        run: mypy
+        if: matrix.python-version == '3.12'
+        run: mypy --python-version 3.12
 
       - name: Pytest
         run: pytest

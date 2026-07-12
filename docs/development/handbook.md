@@ -15,6 +15,16 @@ Para trabajo cotidiano, usa una rama de desarrollo:
 git switch development
 ```
 
+El flujo recomendado de ramas es:
+
+```text
+feature/<tema> -> development -> main
+```
+
+Usa ramas `feature/` o `feat/` para cambios concretos, integra primero en
+`development` y reserva `main` casi exclusivamente para releases formales con
+SemVer.
+
 ## 2. Crear un entorno virtual
 
 Recomendado con `venv`:
@@ -130,11 +140,23 @@ Checklist minimo para un conector:
 
 - Implementa `fetch`.
 - Implementa `search` si la fuente lo permite.
+- Implementa `available_geos`, `available_indicators` y `available_topics`
+  cuando la fuente exponga catalogos equivalentes.
 - Devuelve columnas canonicas.
 - Llena `EconMetadata`.
 - Usa errores personalizados de `economista.core.errors`.
 - Tiene tests con fixtures o mocks.
 - No depende de internet en la suite normal.
+
+Contrato minimo de busqueda:
+
+```text
+source | dataset | kind | id | name
+```
+
+`data.search` es exploracion lexical sobre catalogos oficiales. No debe prometer
+busqueda semantica, IA ni cobertura completa indicador-pais salvo que el
+conector lo implemente y lo documente explicitamente.
 
 Columnas canonicas:
 
