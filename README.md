@@ -42,21 +42,43 @@ metadata = ds.metadata.to_dict()
 `data.fetch` devuelve un `EconDataset`: un `DataFrame` de pandas acompañado de
 metadata económica, esquema e historial mínimo de consulta.
 
-También puedes buscar indicadores:
+También puedes explorar catálogos de datos. `data.search` devuelve un
+`DataFrame` por default para que sea cómodo en notebooks:
 
 ```python
-results = data.search(
+indicadores = data.search(
     source="world_bank",
     query="GDP current US dollars",
-    limit=10,
+    kind="indicators",
 )
 ```
+
+También sirve para encontrar códigos de países sin conocer ISO2 o ISO3:
+
+```python
+paises = data.search(
+    source="world_bank",
+    query="Mexico",
+    kind="geos",
+)
+```
+
+Puedes buscar en todos los conectores registrados omitiendo `source`, limitar
+resultados con `limit=25` o traer todo con `limit=None`:
+
+```python
+resultados = data.search(query="external debt", kind="all")
+```
+
+La búsqueda actual es lexical sobre catálogos oficiales. No usa embeddings,
+modelos de lenguaje ni verifica todavía cobertura completa indicador-país.
 
 ## Alcance actual
 
 El primer MVP funcional incluye World Bank/WDI, esquema canónico, metadata,
-exportación CSV/JSON/Parquet y caché local mínima. FRED, IMF, INEGI y carga
-local CSV/Excel serán los siguientes cortes.
+exportación CSV/JSON/Parquet, caché local mínima y exploración tabular de
+catálogos World Bank. FRED, IMF, INEGI y carga local CSV/Excel serán los
+siguientes cortes.
 
 Ejemplos interactivos:
 
@@ -64,3 +86,8 @@ Ejemplos interactivos:
 - `examples/world_bank_population.ipynb`
 - `examples/world_bank_gdp_growth.ipynb`
 - `examples/world_bank_inflation.ipynb`
+
+## Desarrollo
+
+La guia para instalar, probar y trabajar localmente en el paquete esta en
+`docs/development/handbook.md`.

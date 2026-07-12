@@ -1,0 +1,78 @@
+[
+  {
+    "page": 1,
+    "pages": 1,
+    "per_page": 1000,
+    "total": 4
+  },
+  [
+    {
+      "id": "ARG",
+      "iso2Code": "AR",
+      "name": "Argentina",
+      "region": {
+        "id": "LCN",
+        "value": "Latin America & Caribbean"
+      },
+      "incomeLevel": {
+        "id": "UMC",
+        "value": "Upper middle income"
+      },
+      "lendingType": {
+        "id": "IBD",
+        "value": "IBRD"
+      }
+    },
+    {
+      "id": "MEX",
+      "iso2Code": "MX",
+      "name": "Mexico",
+      "region": {
+        "id": "LCN",
+        "value": "Latin America & Caribbean"
+      },
+      "incomeLevel": {
+        "id": "UMC",
+        "value": "Upper middle income"
+      },
+      "lendingType": {
+        "id": "IBD",
+        "value": "IBRD"
+      }
+    },
+    {
+      "id": "FRA",
+      "iso2Code": "FR",
+      "name": "France",
+      "region": {
+        "id": "ECS",
+        "value": "Europe & Central Asia"
+      },
+      "incomeLevel": {
+        "id": "HIC",
+        "value": "High income"
+      },
+      "lendingType": {
+        "id": "LNX",
+        "value": "Not classified"
+      }
+    },
+    {
+      "id": "EUU",
+      "iso2Code": "EU",
+      "name": "European Union",
+      "region": {
+        "id": "NA",
+        "value": "Aggregates"
+      },
+      "incomeLevel": {
+        "id": "NA",
+        "value": "Aggregates"
+      },
+      "lendingType": {
+        "id": "NA",
+        "value": "Aggregates"
+      }
+    }
+  ]
+]

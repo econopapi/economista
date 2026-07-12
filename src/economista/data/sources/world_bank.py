@@ -6,6 +6,7 @@ import re
 import time
 from datetime import datetime, timezone
 from typing import Any
+from unicodedata import normalize
 
 import httpx
 import pandas as pd
@@ -21,7 +22,7 @@ from economista.core.errors import (
 from economista.core.metadata import EconMetadata
 from economista.core.query import DataQuery
 from economista.core.schema import CANONICAL_ECON_SCHEMA
-from economista.data.base import BaseConnector
+from economista.data.base import BaseConnector, SearchKind, SearchRows
 
 JsonObject = dict[str, Any]
 
@@ -71,47 +72,77 @@ class WorldBankConnector(BaseConnector):
 
     def search(
         self,
-        query: str,
-        limit: int = 20,
+        query: str | None = None,
+        *,
+        dataset: str | None = None,
+        kind: SearchKind = "all",
+        limit: int | None = 25,
         **kwargs: Any,
-    ) -> list[dict[str, Any]]:
-        """Search WDI indicators by id, name, or source note."""
-        data_query = DataQuery(
-            source=self.source,
-            dataset=self.dataset,
-            params={"search": query, "limit": limit, **kwargs},
+    ) -> SearchRows:
+        """Search WDI catalog entries by id, name, notes, or classifications."""
+        self._validate_dataset(dataset)
+        self._validate_search_kind(kind)
+        self._validate_search_limit(limit)
+        self._validate_search_filters(kwargs)
+
+        catalogs = ("indicators", "geos", "topics") if kind == "all" else (kind,)
+        results: SearchRows = []
+        for catalog in catalogs:
+            rows = self._catalog_rows(catalog)
+            results.extend(self._filter_search_rows(rows, query=query, filters=kwargs))
+
+        return self._apply_search_limit(results, limit)
+
+    def available_geos(
+        self,
+        query: str | None = None,
+        *,
+        dataset: str | None = None,
+        limit: int | None = 25,
+        **kwargs: Any,
+    ) -> SearchRows:
+        """Return World Bank geographic entities."""
+        return self.search(
+            query=query,
+            dataset=dataset,
+            kind="geos",
+            limit=limit,
+            **kwargs,
         )
-        cached_payload = self._cache_store.get(data_query) if self.cache else None
-        if cached_payload is None:
-            payload = self._request_all_pages(
-                f"{self.base_url}/sources/2/indicators",
-                params={"format": "json", "per_page": 1000},
-            )
-            if self.cache:
-                self._cache_store.set(data_query, payload)
-        else:
-            payload = cached_payload
 
-        tokens = self._search_tokens(query)
-        results: list[dict[str, Any]] = []
-        for item in self._payload_rows(payload):
-            indicator_id = str(item.get("id", ""))
-            name = str(item.get("name", ""))
-            note = str(item.get("sourceNote", ""))
-            haystack = self._normalize_search_text(f"{indicator_id} {name} {note}")
-            if all(token in haystack for token in tokens):
-                results.append(
-                    {
-                        "id": indicator_id,
-                        "name": name,
-                        "source": self.source,
-                        "dataset": self.dataset,
-                    }
-                )
-                if len(results) >= limit:
-                    break
+    def available_indicators(
+        self,
+        query: str | None = None,
+        *,
+        dataset: str | None = None,
+        limit: int | None = 25,
+        **kwargs: Any,
+    ) -> SearchRows:
+        """Return WDI indicators."""
+        return self.search(
+            query=query,
+            dataset=dataset,
+            kind="indicators",
+            limit=limit,
+            **kwargs,
+        )
 
-        return results
+    def available_topics(
+        self,
+        query: str | None = None,
+        *,
+        dataset: str | None = None,
+        limit: int | None = 25,
+        **kwargs: Any,
+    ) -> SearchRows:
+        """Return World Bank topics."""
+        return self.search(
+            query=query,
+            dataset=dataset,
+            kind="topics",
+            limit=limit,
+            **kwargs,
+        )
 
     def _coerce_query(self, query: DataQuery | None, **kwargs: Any) -> DataQuery:
         if query is not None:
@@ -206,7 +237,7 @@ class WorldBankConnector(BaseConnector):
             unit=self._single_indicator_unit(indicator_metadata),
             frequency=self._frequency_from_query(query),
             geo_coverage=self._geo_coverage(query.geo),
-            time_coverage=self._time_coverage(query.start, query.end),
+            time_coverage=self._observed_time_coverage(frame),
             downloaded_at=datetime.fromisoformat(downloaded_at),
             license="World Bank Open Data",
             methodology_url="https://datahelpdesk.worldbank.org/",
@@ -240,6 +271,194 @@ class WorldBankConnector(BaseConnector):
 
     def _empty_payload(self) -> JsonObject:
         return {"metadata": {}, "rows": []}
+
+    def _catalog_rows(self, catalog: str) -> SearchRows:
+        payload = self._catalog_payload(catalog)
+        if catalog == "indicators":
+            return self._indicator_catalog_rows(payload)
+        if catalog == "geos":
+            return self._geo_catalog_rows(payload)
+        if catalog == "topics":
+            return self._topic_catalog_rows(payload)
+
+        raise ValueError(f"Unsupported World Bank catalog {catalog!r}.")
+
+    def _catalog_payload(self, catalog: str) -> JsonObject:
+        data_query = DataQuery(
+            source=self.source,
+            dataset=self.dataset,
+            params={"catalog": catalog},
+        )
+        cached_payload = self._cache_store.get(data_query) if self.cache else None
+        if cached_payload is not None:
+            if not isinstance(cached_payload, dict):
+                raise SourceUnavailableError("World Bank cache payload is invalid.")
+            return cached_payload
+
+        path_by_catalog = {
+            "indicators": "/sources/2/indicators",
+            "geos": "/country",
+            "topics": "/topic",
+        }
+        try:
+            path = path_by_catalog[catalog]
+        except KeyError as error:
+            raise ValueError(f"Unsupported World Bank catalog {catalog!r}.") from error
+
+        payload = self._request_all_pages(
+            f"{self.base_url}{path}",
+            params={"format": "json", "per_page": 1000},
+        )
+        if self.cache:
+            self._cache_store.set(data_query, payload)
+
+        return payload
+
+    def _indicator_catalog_rows(self, payload: JsonObject) -> SearchRows:
+        rows: SearchRows = []
+        for item in self._payload_rows(payload):
+            indicator_id = str(item.get("id", ""))
+            name = str(item.get("name", ""))
+            source = self._nested_dict(item, "source")
+            rows.append(
+                {
+                    "source": self.source,
+                    "dataset": self.dataset,
+                    "kind": "indicators",
+                    "id": indicator_id,
+                    "name": name,
+                    "unit": str(item.get("unit", "")),
+                    "source_note": str(item.get("sourceNote", "")),
+                    "source_organization": str(
+                        item.get("sourceOrganization") or source.get("value") or ""
+                    ),
+                    "topics": self._topic_values(item.get("topics")),
+                }
+            )
+
+        return rows
+
+    def _geo_catalog_rows(self, payload: JsonObject) -> SearchRows:
+        rows: SearchRows = []
+        for item in self._payload_rows(payload):
+            region = self._nested_value(item, "region")
+            iso3 = str(item.get("id", ""))
+            rows.append(
+                {
+                    "source": self.source,
+                    "dataset": self.dataset,
+                    "kind": "geos",
+                    "id": iso3,
+                    "name": str(item.get("name", "")),
+                    "iso2": str(item.get("iso2Code", "")),
+                    "iso3": iso3,
+                    "region": region,
+                    "income_level": self._nested_value(item, "incomeLevel"),
+                    "lending_type": self._nested_value(item, "lendingType"),
+                    "is_aggregate": region.casefold() == "aggregates",
+                }
+            )
+
+        return rows
+
+    def _topic_catalog_rows(self, payload: JsonObject) -> SearchRows:
+        rows: SearchRows = []
+        for item in self._payload_rows(payload):
+            rows.append(
+                {
+                    "source": self.source,
+                    "dataset": self.dataset,
+                    "kind": "topics",
+                    "id": str(item.get("id", "")),
+                    "name": str(item.get("value") or item.get("name") or ""),
+                    "description": str(item.get("sourceNote", "")),
+                }
+            )
+
+        return rows
+
+    def _filter_search_rows(
+        self,
+        rows: SearchRows,
+        *,
+        query: str | None,
+        filters: dict[str, Any],
+    ) -> SearchRows:
+        tokens = self._search_tokens(query)
+        return [
+            row
+            for row in rows
+            if self._matches_query(row, tokens) and self._matches_filters(row, filters)
+        ]
+
+    def _matches_query(self, row: dict[str, Any], tokens: list[str]) -> bool:
+        if not tokens:
+            return True
+
+        haystack = self._normalize_search_text(
+            " ".join(str(value) for value in row.values())
+        )
+        return all(token in haystack for token in tokens)
+
+    def _matches_filters(self, row: dict[str, Any], filters: dict[str, Any]) -> bool:
+        if (
+            "include_aggregates" in filters
+            and not filters["include_aggregates"]
+            and bool(row.get("is_aggregate"))
+        ):
+            return False
+        if "region" in filters and not self._field_matches(
+            row,
+            "region",
+            filters["region"],
+        ):
+            return False
+        if "income_level" in filters and not self._field_matches(
+            row,
+            "income_level",
+            filters["income_level"],
+        ):
+            return False
+
+        return not (
+            "topic" in filters
+            and not self._field_matches(row, "topics", filters["topic"])
+        )
+
+    def _field_matches(self, row: dict[str, Any], field: str, expected: Any) -> bool:
+        if expected is None:
+            return True
+
+        actual = self._normalize_search_text(str(row.get(field, "")))
+        expected_values = expected if isinstance(expected, list) else [expected]
+        return any(
+            self._normalize_search_text(str(value)) in actual
+            for value in expected_values
+        )
+
+    def _validate_search_kind(self, kind: str) -> None:
+        if kind not in {"all", "indicators", "geos", "topics"}:
+            raise ValueError(
+                "World Bank search kind must be one of 'all', 'indicators', "
+                "'geos', or 'topics'."
+            )
+
+    def _validate_search_limit(self, limit: int | None) -> None:
+        if limit is not None and limit <= 0:
+            raise ValueError("search limit must be a positive integer or None.")
+
+    def _validate_search_filters(self, filters: dict[str, Any]) -> None:
+        supported_filters = {"include_aggregates", "region", "income_level", "topic"}
+        unsupported = set(filters) - supported_filters
+        if unsupported:
+            names = ", ".join(sorted(unsupported))
+            raise ValueError(f"Unsupported World Bank search filters: {names}.")
+
+    def _apply_search_limit(self, rows: SearchRows, limit: int | None) -> SearchRows:
+        if limit is None:
+            return rows
+
+        return rows[:limit]
 
     def _request_json(self, url: str, params: dict[str, Any]) -> Any:
         retry_statuses = {429, 502, 503, 504}
@@ -337,6 +556,23 @@ class WorldBankConnector(BaseConnector):
         value = row.get(key, {})
         return value if isinstance(value, dict) else {}
 
+    def _nested_value(self, row: JsonObject, key: str) -> str:
+        value = self._nested_dict(row, key)
+        return str(value.get("value", ""))
+
+    def _topic_values(self, value: Any) -> str:
+        if not isinstance(value, list):
+            return ""
+
+        topics = []
+        for item in value:
+            if isinstance(item, dict):
+                topic = item.get("value") or item.get("name") or item.get("id")
+                if topic is not None:
+                    topics.append(str(topic))
+
+        return "; ".join(topics)
+
     def _single_indicator_name(self, metadata: dict[str, JsonObject]) -> str | None:
         names = {str(item.get("name", "")) for item in metadata.values()}
         names.discard("")
@@ -355,11 +591,15 @@ class WorldBankConnector(BaseConnector):
 
         return value
 
-    def _search_tokens(self, query: str) -> list[str]:
+    def _search_tokens(self, query: str | None) -> list[str]:
+        if query is None:
+            return []
+
         return self._normalize_search_text(query).split()
 
     def _normalize_search_text(self, value: str) -> str:
-        text = value.casefold().replace("$", " dollars ")
+        ascii_text = normalize("NFKD", value).encode("ascii", "ignore").decode("ascii")
+        text = ascii_text.casefold().replace("$", " dollars ")
         return re.sub(r"[^a-z0-9]+", " ", text)
 
     def _date_range(
@@ -400,3 +640,13 @@ class WorldBankConnector(BaseConnector):
             return (start, start)
 
         return (start, end)
+
+    def _observed_time_coverage(self, frame: pd.DataFrame) -> tuple[str, str] | None:
+        if "time" not in frame:
+            return None
+
+        values = [str(value) for value in frame["time"].dropna().tolist()]
+        if not values:
+            return None
+
+        return (min(values), max(values))

@@ -6,7 +6,7 @@ import json
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, cast
+from typing import Any
 
 import pandas as pd
 from typing_extensions import Self
@@ -27,7 +27,7 @@ class EconDataset:
     def to_pandas(self, copy: bool = True) -> pd.DataFrame:
         """Return the underlying pandas DataFrame."""
         if copy:
-            return cast(pd.DataFrame, self.frame.copy())
+            return self.frame.copy()
 
         return self.frame
 
