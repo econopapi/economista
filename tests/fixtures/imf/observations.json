@@ -1,0 +1,21 @@
+{
+  "api": {"version": "v2"},
+  "indicators": {
+    "NGDP_RPCH": {
+      "label": "Real GDP growth",
+      "description": "Annual change in real gross domestic product.",
+      "source": "World Economic Outlook (April 2026)",
+      "unit": "Annual percent change",
+      "dataset": "WEO",
+      "projection-year": 2026,
+      "last-modified": "2026-04-08 16:07:34"
+    }
+  },
+  "values": {
+    "NGDP_RPCH": {
+      "MEX": {"2022": 3.9, "2023": 3.2, "2024": 1.5},
+      "COL": {"2022": 7.3, "2023": 1.1, "2024": 1.6},
+      "USA": {"2022": 2.9, "2023": 2.8, "2024": 2.8}
+    }
+  }
+}

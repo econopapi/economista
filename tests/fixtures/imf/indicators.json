@@ -1,0 +1,23 @@
+{
+  "api": {"version": "v2"},
+  "indicators": {
+    "NGDP_RPCH": {
+      "label": "Real GDP growth",
+      "description": "Annual change in real gross domestic product.",
+      "source": "World Economic Outlook (April 2026)",
+      "unit": "Annual percent change",
+      "dataset": "WEO",
+      "projection-year": 2026,
+      "last-modified": "2026-04-08 16:07:34"
+    },
+    "GGXWDG_NGDP": {
+      "label": "General government gross debt",
+      "description": "General government gross debt as a share of GDP.",
+      "source": "Fiscal Monitor (April 2026)",
+      "unit": "Percent of GDP",
+      "dataset": "FM",
+      "projection-year": 2026,
+      "last-modified": "2026-04-08 16:07:34"
+    }
+  }
+}

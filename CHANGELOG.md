@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.4.0 - 2026-07-26
+
+### Added
+
+- Added the public `imf` connector for IMF DataMapper API v2, including
+  fixture-based fetch and catalog-search coverage for its annual indicators,
+  countries, regions, and analytical groups.
+- Consolidated the World Bank notebooks into `data_world_bank_wdi.ipynb`, added
+  `data_imf_datamapper_weo.ipynb`, and renamed public data examples with the
+  `data_` prefix.
+- Added connector documentation for World Bank/WDI and IMF DataMapper API v2.
+
+### Notes
+
+- `imf` intentionally targets IMF DataMapper API v2, not the separately
+  authenticated IMF SDMX API. Its metadata preserves the originating DataMapper
+  dataset and projected observations must be interpreted accordingly.
+
 ## 0.3.0 - 2026-07-12
 
 ### Added

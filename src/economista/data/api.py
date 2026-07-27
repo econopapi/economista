@@ -10,9 +10,11 @@ from economista.core.dataset import EconDataset
 from economista.core.query import DataQuery
 from economista.data.base import SearchKind, SearchRows
 from economista.data.registry import ConnectorRegistry
+from economista.data.sources.imf import IMFDataMapperConnector
 from economista.data.sources.world_bank import WorldBankConnector
 
 DEFAULT_REGISTRY = ConnectorRegistry()
+DEFAULT_REGISTRY.register(IMFDataMapperConnector.source, IMFDataMapperConnector)
 DEFAULT_REGISTRY.register(WorldBankConnector.source, WorldBankConnector)
 
 
