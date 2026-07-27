@@ -1,4 +1,8 @@
-# economista.py
+# economista.py  
+
+Documentación extensa: https://econopapi.com/proyecto/economista/
+
+---
 
 `economista` es la biblioteca definitiva para datos, análisis e investigación económica aplicada en Python.
 
