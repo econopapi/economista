@@ -1,0 +1,6 @@
+{
+  "api": {"version": "v2"},
+  "groups": {
+    "ADVEC": {"label": "Advanced economies"}
+  }
+}

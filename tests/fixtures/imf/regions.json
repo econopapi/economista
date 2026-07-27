@@ -1,0 +1,6 @@
+{
+  "api": {"version": "v2"},
+  "regions": {
+    "LAC": {"label": "Latin America and the Caribbean"}
+  }
+}
