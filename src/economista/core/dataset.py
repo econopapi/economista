@@ -27,7 +27,7 @@ class EconDataset:
     def to_pandas(self, copy: bool = True) -> pd.DataFrame:
         """Return the underlying pandas DataFrame."""
         if copy:
-            return self.frame.copy()
+            return pd.DataFrame(self.frame, copy=True)
 
         return self.frame
 
