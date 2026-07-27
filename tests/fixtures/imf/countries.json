@@ -1,0 +1,8 @@
+{
+  "api": {"version": "v2"},
+  "countries": {
+    "MEX": {"label": "Mexico"},
+    "COL": {"label": "Colombia"},
+    "USA": {"label": "United States"}
+  }
+}

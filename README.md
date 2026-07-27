@@ -18,10 +18,10 @@ Proyecto en fase fundacional. La API pública todavía no es estable.
 pip install economista
 ```
 
-La instalación base incluye el primer conector de datos, por lo que no necesitas
-extras para empezar a trabajar con World Bank/WDI.
+La instalación base incluye los conectores de datos, por lo que no necesitas
+extras para empezar a trabajar con World Bank/WDI e IMF DataMapper API v2.
 
-## Primer uso
+## World Bank/WDI
 
 ```python
 from economista import data
@@ -63,6 +63,35 @@ paises = data.search(
 )
 ```
 
+## IMF DataMapper API v2
+
+`economista` incluye un conector para la API pública **IMF DataMapper API v2**.
+Es una superficie anual y curada de indicadores IMF —incluidos WEO, Fiscal
+Monitor y otros datasets publicados en DataMapper—, no un reemplazo del API
+SDMX completo de IMF.
+
+```python
+crecimiento = data.fetch(
+    source="imf",
+    indicator="NGDP_RPCH",
+    geo=["MEX", "COL"],
+    start=2020,
+    end=2025,
+)
+
+indicadores_imf = data.search(
+    source="imf",
+    query="real GDP growth",
+    kind="indicators",
+    dataset="WEO",
+)
+```
+
+Cada observación conserva el dataset de procedencia que reporta IMF en la columna
+`dataset` y sus unidades. El catálogo de indicadores expone también el año de
+proyección cuando IMF lo publica; consúltalo antes de tratar una serie como datos
+observados.
+
 Puedes buscar en todos los conectores registrados omitiendo `source`, limitar
 resultados con `limit=25` o traer todo con `limit=None`:
 
@@ -75,17 +104,17 @@ modelos de lenguaje ni verifica todavía cobertura completa indicador-país.
 
 ## Alcance actual
 
-El primer MVP funcional incluye World Bank/WDI, esquema canónico, metadata,
-exportación CSV/JSON/Parquet, caché local mínima y exploración tabular de
-catálogos World Bank. FRED, IMF, INEGI y carga local CSV/Excel serán los
-siguientes cortes.
+El MVP incluye World Bank/WDI e IMF DataMapper API v2, esquema canónico,
+metadata, exportación CSV/JSON/Parquet, caché local mínima y exploración tabular
+de catálogos. FRED, INEGI y carga local CSV/Excel serán los siguientes cortes.
 
 Ejemplos interactivos:
 
-- `examples/world_bank_gdp.ipynb`
-- `examples/world_bank_population.ipynb`
-- `examples/world_bank_gdp_growth.ipynb`
-- `examples/world_bank_inflation.ipynb`
+- `examples/data_search_exploration.ipynb`
+- `examples/data_world_bank_wdi.ipynb`
+- `examples/data_imf_datamapper_weo.ipynb`
+
+La documentación por conector está en `docs/data/`.
 
 ## Desarrollo
 
