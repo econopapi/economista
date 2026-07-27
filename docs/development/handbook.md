@@ -9,21 +9,71 @@ git clone https://github.com/econopapi/economista.git
 cd economista
 ```
 
-Para trabajo cotidiano, usa una rama de desarrollo:
+Para trabajo cotidiano, parte de `development` y crea una rama para cada cambio:
 
 ```bash
 git switch development
+git pull --ff-only origin development
+git switch -c feat/<tema>
 ```
 
 El flujo recomendado de ramas es:
 
 ```text
-feature/<tema> -> development -> main
+feat/<tema> -- PR --> development -- release PR --> main -- tag --> GitHub Release --> PyPI
 ```
 
 Usa ramas `feature/` o `feat/` para cambios concretos, integra primero en
 `development` y reserva `main` casi exclusivamente para releases formales con
 SemVer.
+
+La separación de responsabilidades es intencional:
+
+- `feat/<tema> → development`: implementa capacidad, pruebas, ejemplos y
+  documentación; **no** modifica la versión en `pyproject.toml` ni cierra el
+  bloque `Unreleased`.
+- `development → main`: es el PR de release; actualiza `pyproject.toml`, mueve
+  `Unreleased` a la versión y fecha de publicación, y prepara el tag.
+
+### Trabajar en una feature branch
+
+Usa un nombre que describa la capacidad, por ejemplo:
+
+```bash
+git switch -c feat/data-imf-datamapper-connector
+```
+
+Antes de cada commit, revisa exactamente lo que va a entrar:
+
+```bash
+git status --short
+git diff --check
+git diff
+git add <rutas>
+git diff --cached
+git commit -m "feat(data): descripcion breve"
+```
+
+Después publica la rama y abre un PR hacia `development`:
+
+```bash
+git push -u origin feat/data-imf-datamapper-connector
+gh pr create \
+  --base development \
+  --head feat/data-imf-datamapper-connector \
+  --title "feat(data): add IMF DataMapper v2 connector" \
+  --fill
+```
+
+No inicies trabajo nuevo directamente sobre `main`. Si ya tienes cambios sin
+commit en `main`, no hace falta perderlos ni usar `stash`: crea inmediatamente
+la feature branch desde ese estado y los cambios seguirán en el árbol de trabajo.
+
+```bash
+git switch -c feat/<tema>
+git branch --show-current
+git status --short
+```
 
 ## 2. Crear un entorno virtual
 
@@ -116,6 +166,7 @@ src/economista/
     ├── base.py
     ├── registry.py
     └── sources/
+        ├── imf.py
         └── world_bank.py
 ```
 
@@ -179,10 +230,9 @@ Reglas:
 Notebooks actuales:
 
 ```text
-examples/world_bank_gdp.ipynb
-examples/world_bank_population.ipynb
-examples/world_bank_gdp_growth.ipynb
-examples/world_bank_inflation.ipynb
+examples/data_search_exploration.ipynb
+examples/data_world_bank_wdi.ipynb
+examples/data_imf_datamapper_weo.ipynb
 ```
 
 Para abrirlos:
@@ -231,20 +281,43 @@ mypy
 python -m build
 ```
 
-La version en `pyproject.toml` debe coincidir con el tag:
+### Preparar la release
+
+Una capacidad pública nueva, como un conector, requiere un incremento minor en
+la serie `0.x`. Las feature branches dejan esos cambios bajo `Unreleased`; la
+preparación de release ocurre exclusivamente en un PR de `development` hacia
+`main`:
+
+1. Actualiza la versión en `pyproject.toml`.
+2. Cambia el bloque `Unreleased` de `CHANGELOG.md` por la versión y fecha de
+   release.
+3. Ejecuta el checklist anterior, incluyendo `mypy` y `python -m build`.
+4. Abre, revisa y fusiona el PR de release hacia `main`.
+
+La versión de `pyproject.toml` debe coincidir con el tag:
 
 ```text
-version = "0.2.1"
-tag = v0.2.1
+version = "0.4.0"
+tag = v0.4.0
 ```
 
-Crear release con GitHub CLI:
+Tras el merge, etiqueta el commit de `main` y crea el GitHub Release:
 
 ```bash
-gh release create vX.Y.Z \
-  --title "economista X.Y.Z" \
-  --notes "Resumen breve de cambios."
+git switch main
+git pull --ff-only origin main
+git tag -a v0.4.0 -m "release: economista 0.4.0"
+git push origin v0.4.0
+
+gh release create v0.4.0 \
+  --title "economista 0.4.0" \
+  --generate-notes \
+  --verify-tag
 ```
+
+El workflow `Publish to PyPI` se ejecuta al publicar el GitHub Release; no
+publiques manualmente el mismo artefacto desde otra máquina. Verifica en GitHub
+que el entorno `pypi` y el workflow de publicación terminaron correctamente.
 
 ## 11. Errores comunes
 
