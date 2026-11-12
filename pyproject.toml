@@ -58,6 +58,7 @@ dependencies = [
 [project.optional-dependencies]
 data = []
 analysis = [
+  "powerlaw>=2,<3",
   "scipy>=1.11",
   "statsmodels>=0.14"
 ]
