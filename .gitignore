@@ -34,9 +34,11 @@ htmlcov/
 .DS_Store
 Thumbs.db
 
-# Documentos de desarrollo
-AGENTS.md
+# Documento fundacional local; el apéndice público vive en docs/development/
 V1_ECONOMISTA_DOCUMENTO_FUNDACIONAL_DEFINITIVO.md
 
 # Pruebas manuales locales
 examples/devtest_*.ipynb
+
+# Microdatos descargados para notebooks
+examples/data/

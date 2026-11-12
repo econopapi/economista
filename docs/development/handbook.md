@@ -23,6 +23,10 @@ El flujo recomendado de ramas es:
 feat/<tema> -- PR --> development -- release PR --> main -- tag --> GitHub Release --> PyPI
 ```
 
+El release inicia la fase de investigación y divulgación descrita en
+[GOVERNANCE.md](../../GOVERNANCE.md). Daniel y Jesús deben aprobar los resultados
+públicos antes de empezar otra funcionalidad. Correcciones y mantenimiento
+pueden continuar durante esa fase.
 Usa ramas `feature/` o `feat/` para cambios concretos, integra primero en
 `development` y reserva `main` casi exclusivamente para releases formales con
 SemVer.
@@ -104,10 +108,11 @@ python -m pip install -e .
 La bandera `-e` significa "editable": los cambios en `src/economista/` se ven
 sin reinstalar el paquete.
 
-Para desarrollar, instala tambien las dependencias de calidad y pruebas:
+Para desarrollar y ejecutar la suite completa, instala también análisis y las
+dependencias de calidad y pruebas:
 
 ```bash
-python -m pip install -e ".[dev]"
+python -m pip install -e ".[dev,analysis]"
 ```
 
 En shells que tratan los corchetes de forma especial, conserva las comillas.
@@ -233,7 +238,14 @@ Notebooks actuales:
 examples/data_search_exploration.ipynb
 examples/data_world_bank_wdi.ipynb
 examples/data_imf_datamapper_weo.ipynb
+examples/analysis_power_law_iter_2020.ipynb
+examples/analysis_power_law_enigh_2024.ipynb
 ```
+
+Los dos notebooks de análisis leen archivos oficiales de INEGI desde
+`examples/data/` y se ejecutan con el directorio de trabajo en `examples/`.
+Esa carpeta está excluida de Git. Consulta [la guía de análisis de
+colas](../analysis/power_laws.md) para fuentes y límites de interpretación.
 
 Para abrirlos:
 
@@ -323,10 +335,10 @@ que el entorno `pypi` y el workflow de publicación terminaron correctamente.
 
 ### `pytest`, `ruff` o `mypy` no existen
 
-Instala dependencias de desarrollo:
+Instala dependencias de desarrollo y análisis:
 
 ```bash
-python -m pip install -e ".[dev]"
+python -m pip install -e ".[dev,analysis]"
 ```
 
 ### Cambios locales no se reflejan al importar

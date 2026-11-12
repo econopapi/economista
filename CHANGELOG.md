@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Added `analysis.fit_power_law` and a typed result adapter for the external
+  `powerlaw` package, available through the `analysis` extra.
+- Added the research and dissemination governance cycle and two INEGI study
+  notebooks for locality population and exploratory household income tails.
+
 ## 0.4.0 - 2026-07-26
 
 ### Added

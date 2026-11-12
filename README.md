@@ -25,6 +25,26 @@ pip install economista
 La instalación base incluye los conectores de datos, por lo que no necesitas
 extras para empezar a trabajar con World Bank/WDI e IMF DataMapper API v2.
 
+Para análisis de colas con `powerlaw`, instala el extra de análisis:
+
+```bash
+pip install "economista[analysis]"
+```
+
+```python
+import numpy as np
+from economista.analysis import fit_power_law
+
+# Datos sintéticos para demostrar la API; los estudios reales están en examples/.
+datos = np.random.default_rng(42).zipf(2.5, size=1_000)
+fit = fit_power_law(datos, discrete=True, xmin=1)
+print(fit.alpha, fit.xmin, fit.n_tail)
+comparison = fit.compare_to("lognormal")
+```
+
+La [guía de análisis de colas](docs/analysis/power_laws.md) explica la API,
+los diagnósticos y sus límites estadísticos.
+
 ## World Bank/WDI
 
 ```python
@@ -108,15 +128,19 @@ modelos de lenguaje ni verifica todavía cobertura completa indicador-país.
 
 ## Alcance actual
 
-El MVP incluye World Bank/WDI e IMF DataMapper API v2, esquema canónico,
+El paquete incluye World Bank/WDI e IMF DataMapper API v2, esquema canónico,
 metadata, exportación CSV/JSON/Parquet, caché local mínima y exploración tabular
-de catálogos. FRED, INEGI y carga local CSV/Excel serán los siguientes cortes.
+de catálogos. El extra `analysis` añade el primer adaptador estadístico.
+FRED, INEGI y carga local CSV/Excel siguen pendientes; los estudios de INEGI
+leen archivos públicos con pandas sin presentarse como conectores del paquete.
 
 Ejemplos interactivos:
 
 - `examples/data_search_exploration.ipynb`
 - `examples/data_world_bank_wdi.ipynb`
 - `examples/data_imf_datamapper_weo.ipynb`
+- `examples/analysis_power_law_iter_2020.ipynb`
+- `examples/analysis_power_law_enigh_2024.ipynb`
 
 La documentación por conector está en `docs/data/`.
 
@@ -124,3 +148,6 @@ La documentación por conector está en `docs/data/`.
 
 La guia para instalar, probar y trabajar localmente en el paquete esta en
 `docs/development/handbook.md`.
+
+El flujo de desarrollo, investigación y divulgación está en
+[GOVERNANCE.md](GOVERNANCE.md).
