@@ -51,6 +51,13 @@ def test_discrete_dataframe_and_series_inputs() -> None:
     assert series_result.column == "population"
 
 
+def test_exponent_is_not_capped_at_three() -> None:
+    observations = np.random.default_rng(31).pareto(4.0, 2_000) + 1.0
+    result = fit_power_law(observations, xmin=1.0)
+
+    assert result.alpha > 3.2
+
+
 @pytest.mark.parametrize(
     ("data", "kwargs"),
     [

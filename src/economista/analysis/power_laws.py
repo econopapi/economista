@@ -139,7 +139,13 @@ def fit_power_law(
             "Install the analysis extra with 'pip install economista[analysis]'."
         ) from exc
     try:
-        raw_fit = powerlaw.Fit(values, discrete=discrete, xmin=xmin, verbose=False)
+        raw_fit = powerlaw.Fit(
+            values,
+            discrete=discrete,
+            xmin=xmin,
+            parameter_ranges={"alpha": (1.0, None)},
+            verbose=False,
+        )
         law = raw_fit.power_law
         fit_xmin = float(raw_fit.xmin)
         n_tail = int(np.count_nonzero(values >= fit_xmin))

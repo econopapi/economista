@@ -35,6 +35,12 @@ forma explícita antes de llamar a la función y registra cuántos excluiste.
 favorece la ley de potencias frente a esa alternativa en la comparación; el
 valor p no prueba bondad absoluta de ajuste.
 
+El adaptador amplía el rango permitido de `alpha` por encima de 3: la versión
+2.0 de `powerlaw` usa 3 como límite superior por defecto, lo que puede truncar
+estimaciones en datos económicos. Informa cualquier advertencia de ajuste de
+la biblioteca; si una distribución alternativa no obtiene un ajuste válido,
+no interpretes su comparación numérica.
+
 El umbral estimado, el exponente y una recta aparente en escala logarítmica no
 demuestran que el mecanismo económico sea una ley de potencias. Compara otras
 distribuciones, informa el número de observaciones en la cola y documenta la
